@@ -9,7 +9,7 @@ class ElevatorSimulation
         end
     end
 
-    def request(from_floor)
+    def request(req_floor)
 
     end
 end
@@ -21,8 +21,36 @@ class Elevator
         @floors_passed = 0
         @current_floor = 1
         @occupied = false
+        @doors_open = false
     end
 
-    def request(from_floor)
+    def request(req_floor)
+        print "received request from floor #{req_floor}"
+        make_trip(req_floor)
+    end
+
+    def make_trip(to_floor)
+        close
+        move_elevator(to_floor - @current_floor)
+        open
+        print "made a trip from #@current_floor to #{to_floor}"
+        @trip_count++
+    end
+
+    def move_elevator(index) 
+        print "moving elevator #{index} floors"
+        @current_floor += index
+        @floors_passed += index.abs
+        print "this elevator has passed #@floors_passed floors"
+    end
+
+    def open
+        print "elevator door is open"
+        @doors_open = true
+    end
+
+    def close
+        print "elevator door is closed"
+        @doors_open = false
     end
 end
