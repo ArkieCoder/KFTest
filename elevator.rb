@@ -12,23 +12,25 @@ class ElevatorSimulation
     def request(req_floor)
         dispatch_candidate = nil
         @elevators.each { |elevator|
-            if elevator.current_floor == req_floor
-                dispatch_candidate = elevator
-                break
-            end
+            if !elevator.in_maintenance
+                if elevator.current_floor == req_floor
+                    dispatch_candidate = elevator
+                    break
+                end
 
-            if elevator.occupied && (elevator.current_floor..elevator.moving_to_floor).cover?(req_floor)
-                dispatch_candidate = elevator
-                break
-            end
+                if elevator.occupied && (elevator.current_floor..elevator.moving_to_floor).cover?(req_floor)
+                    dispatch_candidate = elevator
+                    break
+                end
 
-            proximity = elevator.proximity(req_floor)
-            if dispatch_candidate == nil ||
-                (
-                    proximity < dispatch_candidate.proximity &&
-                    !elevator.occupied
-                )
-                dispatch_candidate = elevator
+                proximity = elevator.proximity(req_floor)
+                if dispatch_candidate == nil ||
+                    (
+                        proximity < dispatch_candidate.proximity(req_floor) &&
+                        !elevator.occupied
+                    )
+                    dispatch_candidate = elevator
+                end
             end
         }
         dispatch_candidate.request(req_floor)
@@ -47,13 +49,45 @@ class Elevator
         @moving_to_floor = 1
     end
 
+    def floor_count
+        @floor_count
+    end
+
+    def trip_count
+        @trip_count
+    end
+
+    def floors_passed
+        @floors_passed
+    end
+
+    def current_floor
+        @current_floor
+    end
+
+    def occupied
+        @occupied
+    end
+
+    def doors_open
+        @doors_open
+    end
+
+    def in_maintenance
+        @in_maintenance
+    end
+
+    def moving_to_floor
+        @moving_to_floor
+    end
+
     def proximity(req_floor)
         return (req_floor - @current_floor).abs
     end
 
     def request(req_floor)
-        print "received request from floor #{req_floor}"
-        error_msg = "ERROR: cannot go to non-existent floor __DIR__ current range - ignoring request"
+        print "received request from floor #{req_floor}\n"
+        error_msg = "ERROR: cannot go to non-existent floor __DIR__ current range - ignoring request\n"
         if req_floor > @floor_count
             print error_msg.sub(/__DIR__/, "above")
         elsif req_floor < 1
@@ -67,10 +101,11 @@ class Elevator
         close
         @occupied = true
         @moving_to_floor = to_floor
+        starting_floor = @current_floor
         move_elevator(to_floor - @current_floor)
         open
         @occupied = false 
-        print "made a trip from #@current_floor to #{to_floor}"
+        print "made a trip from #{starting_floor} to #{to_floor}\n"
         @trip_count += 1
         if maintenance_required?
             @in_maintenance = true
@@ -78,7 +113,7 @@ class Elevator
     end
 
     def clear_maintenance_indicator
-        print "clearing maintenance indicator"
+        print "clearing maintenance indicator\n"
         @in_maintenance = false
     end
 
@@ -91,11 +126,11 @@ class Elevator
     end
 
     def move_elevator(index) 
-        print "moving elevator #{index} floors"
+        print "moving elevator #{index} floors\n"
         index.abs.times do
             move_one_floor(index)
         end
-        print "this elevator has passed #@floors_passed floors"
+        print "this elevator has passed #@floors_passed floors\n"
     end
 
     def move_one_floor(index)
@@ -105,18 +140,21 @@ class Elevator
         else
             new_current_floor += 1
         end
-        print "moving from #@current_floor to #{new_current_floor}"
+        print "moving from #@current_floor to #{new_current_floor}\n"
         @current_floor = new_current_floor
         @floors_passed+=1
     end
 
     def open
-        print "elevator door is open"
+        print "elevator door is open\n"
         @doors_open = true
     end
 
     def close
-        print "elevator door is closed"
+        print "elevator door is closed\n"
         @doors_open = false
     end
 end
+
+es = ElevatorSimulation.new(2,10)
+es.request(5)
