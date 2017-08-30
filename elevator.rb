@@ -10,7 +10,28 @@ class ElevatorSimulation
     end
 
     def request(req_floor)
+        dispatch_candidate = nil
+        @elevators.each { |elevator|
+            if elevator.current_floor == req_floor
+                dispatch_candidate = elevator
+                break
+            end
 
+            if elevator.occupied && (elevator.current_floor..elevator.moving_to_floor).cover?(req_floor)
+                dispatch_candidate = elevator
+                break
+            end
+
+            proximity = elevator.proximity(req_floor)
+            if dispatch_candidate == nil ||
+                (
+                    proximity < dispatch_candidate.proximity &&
+                    !elevator.occupied
+                )
+                dispatch_candidate = elevator
+            end
+        }
+        dispatch_candidate.request(req_floor)
     end
 end
 
@@ -23,6 +44,11 @@ class Elevator
         @occupied = false # occupied in the sense of 'on a trip', even though car may be empty
         @doors_open = false
         @in_maintenance = false
+        @moving_to_floor = 1
+    end
+
+    def proximity(req_floor)
+        return (req_floor - @current_floor).abs
     end
 
     def request(req_floor)
@@ -40,6 +66,7 @@ class Elevator
     def make_trip(to_floor)
         close
         @occupied = true
+        @moving_to_floor = to_floor
         move_elevator(to_floor - @current_floor)
         open
         @occupied = false 
@@ -51,15 +78,16 @@ class Elevator
     end
 
     def clear_maintenance_indicator
+        print "clearing maintenance indicator"
         @in_maintenance = false
     end
 
     def maintenance_required?
-        required? = false
+        required = false
         if @trip_count % 100
-            required? = true
+            required = true
         end
-        return required?
+        return required
     end
 
     def move_elevator(index) 
