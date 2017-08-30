@@ -1,5 +1,10 @@
 #!/usr/bin/ruby
 
+### example usage - change as desired at bottom ###
+# es = ElevatorSimulation.new(2,10)
+# es.request(5)
+###################################################
+
 class ElevatorSimulation
     def initialize(elevator_count, floor_count) 
         @elevator_count = elevator_count
