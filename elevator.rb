@@ -71,7 +71,7 @@ class Elevator
         open
         @occupied = false 
         print "made a trip from #@current_floor to #{to_floor}"
-        @trip_count++
+        @trip_count += 1
         if maintenance_required?
             @in_maintenance = true
         end
@@ -101,13 +101,13 @@ class Elevator
     def move_one_floor(index)
         new_current_floor = @current_floor
         if index < 0
-            new_current_floor--
+            new_current_floor -= 1
         else
-            new_current_floor++
+            new_current_floor += 1
         end
         print "moving from #@current_floor to #{new_current_floor}"
         @current_floor = new_current_floor
-        @floors_passed++
+        @floors_passed+=1
     end
 
     def open
