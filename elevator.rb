@@ -1,3 +1,4 @@
+#!/usr/bin/ruby
 
 class ElevatorSimulation
     def initialize(elevator_count, floor_count) 
