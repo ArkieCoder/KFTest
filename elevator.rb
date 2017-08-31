@@ -44,6 +44,15 @@ class ElevatorSimulation
 end
 
 class Elevator
+    attr_reader :floor_count,
+        :trip_count,
+        :floors_passed,
+        :current_floor,
+        :occupied,
+        :doors_open,
+        :in_maintenance,
+        :moving_to_floor
+
     def initialize(floor_count) 
         @floor_count = floor_count
         @trip_count = 0
@@ -53,38 +62,6 @@ class Elevator
         @doors_open = false
         @in_maintenance = false
         @moving_to_floor = 1
-    end
-
-    def floor_count
-        @floor_count
-    end
-
-    def trip_count
-        @trip_count
-    end
-
-    def floors_passed
-        @floors_passed
-    end
-
-    def current_floor
-        @current_floor
-    end
-
-    def occupied
-        @occupied
-    end
-
-    def doors_open
-        @doors_open
-    end
-
-    def in_maintenance
-        @in_maintenance
-    end
-
-    def moving_to_floor
-        @moving_to_floor
     end
 
     def proximity(req_floor)
